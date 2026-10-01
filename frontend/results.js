@@ -1030,11 +1030,20 @@
   // Replies are advice only -- nothing here edits the itinerary on screen.
   (function initAna() {
     function getAnaApiUrl() {
-      // If loaded directly from the Render deployment, use relative path
-      if (window.location.origin.includes("onrender.com")) {
+      const RENDER_BACKEND_URL = "https://yatrimind-travel-planner-ai-agent.onrender.com";
+
+      if (window.location.origin === RENDER_BACKEND_URL) {
         return "/api/chat";
       }
-      return "https://yatrimind-travel-planner-ai-agent.onrender.com/api/chat";
+
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        return "http://127.0.0.1:8000/api/chat";
+      }
+
+      return `${RENDER_BACKEND_URL}/api/chat`;
     }
 
     const fab = document.getElementById("ana-fab");

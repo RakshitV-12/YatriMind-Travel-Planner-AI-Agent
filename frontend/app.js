@@ -5,9 +5,16 @@
   // When loaded directly from the Render deployment, relative paths are used;
   // otherwise, requests route directly to the production Render URL.
   const RENDER_BACKEND_URL = "https://yatrimind-travel-planner-ai-agent.onrender.com";
-  const API_BASE = (window.location.origin === RENDER_BACKEND_URL || window.location.hostname.endsWith("onrender.com"))
-    ? ""
-    : RENDER_BACKEND_URL;
+
+  const API_BASE =
+    window.location.origin === RENDER_BACKEND_URL
+      ? ""
+      : (
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+        )
+      ? "http://127.0.0.1:8000"
+      : RENDER_BACKEND_URL;
 
   const destinationEl = document.getElementById("destination");
   const originEl = document.getElementById("origin");
