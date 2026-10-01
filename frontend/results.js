@@ -1030,13 +1030,11 @@
   // Replies are advice only -- nothing here edits the itinerary on screen.
   (function initAna() {
     function getAnaApiUrl() {
-      // If loaded directly from FastAPI (port 8000), use relative URL to avoid CORS/PNA entirely
-      if (window.location.port === "8000") {
+      // If loaded directly from the Render deployment, use relative path
+      if (window.location.origin.includes("onrender.com")) {
         return "/api/chat";
       }
-      // Match the frontend's hostname (localhost vs 127.0.0.1) so browser doesn't block Private Network Access
-      const host = window.location.hostname === "localhost" ? "localhost" : "127.0.0.1";
-      return `http://${host}:8000/api/chat`;
+      return "https://yatrimind-travel-planner-ai-agent.onrender.com/api/chat";
     }
 
     const fab = document.getElementById("ana-fab");

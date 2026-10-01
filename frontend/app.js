@@ -1,13 +1,13 @@
 (function () {
   "use strict";
 
-  // Backend origin. The frontend is served independently of FastAPI (its own
-  // static server / opened directly), so every API call needs a full origin,
-  // not a relative path. Change this if uvicorn runs on a different host or
-  // port; it defaults to the standard local dev address.
-  const API_BASE = window.location.port === "8000"
+  // Backend origin. Points to the deployed Render backend API.
+  // When loaded directly from the Render deployment, relative paths are used;
+  // otherwise, requests route directly to the production Render URL.
+  const RENDER_BACKEND_URL = "https://yatrimind-travel-planner-ai-agent.onrender.com";
+  const API_BASE = (window.location.origin === RENDER_BACKEND_URL || window.location.hostname.endsWith("onrender.com"))
     ? ""
-    : `http://${window.location.hostname === "localhost" ? "localhost" : "127.0.0.1"}:8000`;
+    : RENDER_BACKEND_URL;
 
   const destinationEl = document.getElementById("destination");
   const originEl = document.getElementById("origin");
