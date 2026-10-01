@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your itinerary — YATRMIND TRAVEL AI AGENT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="results-body">
+
+  <div class="page results-page" id="results-root">
+
+    <div class="empty-state" id="empty-state" hidden>
+      <h1>No itinerary to show yet</h1>
+      <p>Start a new search and we'll bring you back here with a full day-by-day plan.</p>
+      <a class="submit-btn" href="index.html">Plan a trip</a>
+    </div>
+
+    <div id="results-content" hidden>
+
+      <header class="ticket-header">
+        <div class="ticket-main">
+          <div class="ticket-meta-badges">
+            <span class="ticket-eyebrow" id="ticket-tier"></span>
+            <span class="ticket-budget-pill">
+              <span class="ticket-budget-label">Est. Total</span>
+              <strong class="ticket-budget-val" id="ticket-budget">—</strong>
+            </span>
+          </div>
+          <h1 id="ticket-destination">—</h1>
+          <p class="ticket-dates" id="ticket-dates"></p>
+        </div>
+        <div class="ticket-figures">
+          <div class="ticket-figure">
+            <span class="figure-value" id="ticket-duration">—</span>
+            <span class="figure-label">days</span>
+          </div>
+          <div class="ticket-figure">
+            <span class="figure-value" id="ticket-travelers">—</span>
+            <span class="figure-label">travelers</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="perforation" aria-hidden="true"></div>
+
+      <nav class="section-tabs" id="section-tabs">
+        <button type="button" class="section-tab-btn is-active" data-tab="itinerary">Itinerary</button>
+        <button type="button" class="section-tab-btn" data-tab="flights">Flights</button>
+        <button type="button" class="section-tab-btn" data-tab="hotels">Where to stay</button>
+        <button type="button" class="section-tab-btn" data-tab="budget">Budget</button>
+      </nav>
+
+      <section class="section-tab-panel is-active" id="tab-itinerary" data-tab-panel="itinerary">
+        <div class="trip-summary-card" id="trip-summary-card"></div>
+        <nav class="day-tabs" id="day-tabs" aria-label="Days"></nav>
+        <main id="day-panels"></main>
+      </section>
+
+      <section class="section-tab-panel" id="tab-flights" data-tab-panel="flights">
+        <section class="flights-section" id="flights-section" hidden>
+          <h2>Flights</h2>
+          <p class="flights-note" id="flights-note"></p>
+          <div class="flights-body" id="flights-body"></div>
+        </section>
+      </section>
+
+      <section class="section-tab-panel" id="tab-hotels" data-tab-panel="hotels">
+        <section class="hotels-section" id="hotels-section" hidden>
+          <h2>Where to stay</h2>
+          <div class="hotel-enforced" id="hotel-enforced" hidden></div>
+          <div class="hotel-list" id="hotel-list"></div>
+        </section>
+      </section>
+
+      <section class="section-tab-panel" id="tab-budget" data-tab-panel="budget">
+        <section class="budget-section" id="budget-section" hidden>
+          <h2>Budget breakdown</h2>
+          <div class="budget-donut-wrap" id="budget-donut-wrap" hidden>
+            <div class="budget-donut" id="budget-donut">
+              <div class="budget-donut-center" id="budget-donut-center"></div>
+            </div>
+            <ul class="budget-legend" id="budget-legend"></ul>
+          </div>
+          <div class="budget-table" id="budget-table"></div>
+        </section>
+      </section>
+
+      <div class="results-footer">
+        <a class="ghost-btn" href="index.html">Plan another trip</a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <button type="button" class="ana-fab" id="ana-fab" aria-controls="ana-panel" aria-expanded="false" title="Ask COMPASS, your AI travel companion">
+    <span class="ana-fab-glow" aria-hidden="true"></span>
+    <span class="ana-avatar" aria-hidden="true">
+      <svg class="ana-avatar-svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        <path d="M12 2L14.4 8.6L21 11L14.4 13.4L12 20L9.6 13.4L3 11L9.6 8.6L12 2Z"/>
+      </svg>
+    </span>
+    <span class="ana-fab-text">Ask COMPASS</span>
+    <span class="ana-fab-pill">AI</span>
+  </button>
+
+  <aside class="ana-panel" id="ana-panel" hidden aria-label="COMPASS, your AI travel companion">
+    <header class="ana-head">
+      <div class="ana-avatar-wrap">
+        <span class="ana-avatar ana-avatar--lg" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M12 2L14.5 8.5L21 11L14.5 13.5L12 20L9.5 13.5L3 11L9.5 8.5L12 2Z"/>
+          </svg>
+        </span>
+        <span class="ana-pulse-dot" title="Active"></span>
+      </div>
+      <div class="ana-head-text">
+        <div class="ana-head-title">
+          <strong>COMPASS</strong>
+          <span class="ana-badge-pill">Travel AI</span>
+        </div>
+        <span class="ana-head-sub"><i class="ana-dot"></i> Online & ready to guide your trip</span>
+      </div>
+      <div class="ana-head-actions">
+        <button type="button" class="ana-action-btn" id="ana-clear" title="Start new conversation" aria-label="Clear chat">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+        </button>
+        <button type="button" class="ana-close" id="ana-close" title="Close chat" aria-label="Close chat">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="ana-log" id="ana-log" aria-live="polite">
+      <div class="ana-msg ana-msg--ana">
+        <div class="ana-msg-author">
+          <span class="ana-msg-avatar">✦</span>
+          <span class="ana-msg-name">COMPASS</span>
+        </div>
+        <div class="ana-msg-content">
+          <p class="ana-p">Hi, I'm <strong>COMPASS</strong>, your travel companion! Ask me anything about this itinerary, local packing tips, budgeting, or destination secrets. ✨</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ana-chips-wrapper">
+      <div class="ana-chips" id="ana-chips">
+        <button type="button" class="ana-chip">✨ Make it more relaxed</button>
+        <button type="button" class="ana-chip">🍜 Local food spots</button>
+        <button type="button" class="ana-chip">📸 Photography spots</button>
+        <button type="button" class="ana-chip">💰 Budget advice</button>
+        <button type="button" class="ana-chip">🧳 What to pack</button>
+      </div>
+    </div>
+
+    <form class="ana-form" id="ana-form">
+      <div class="ana-input-wrap">
+        <input type="text" id="ana-input" placeholder="Ask COMPASS anything about your trip…" autocomplete="off">
+        <button type="submit" class="ana-send" id="ana-send-btn" aria-label="Send message">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </form>
+  </aside>
+
+  <script src="results.js"></script>
+</body>
+
+</html>

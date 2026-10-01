@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plan a trip — YATRMIND TRAVEL AI AGENT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="page">
+
+    <nav class="site-nav" aria-label="Site">
+      <a class="brand" href="index.html">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M3 25 L12 9 L17 18 L21 12 L29 25 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" />
+        </svg>
+        <span>YATRMIND TRAVEL AI AGENT</span>
+      </a>
+      <span class="nav-tagline">AI travel planner</span>
+    </nav>
+
+    <header class="hero">
+      <svg class="hero-map" viewBox="0 0 700 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <path class="route-path" d="M 60 440 C 140 380, 120 300, 210 270 S 340 220, 360 150 S 480 90, 620 70"
+          fill="none" stroke="var(--route-gold)" stroke-width="2.5" stroke-dasharray="1 14" stroke-linecap="round" />
+        <circle class="route-dot" cx="60" cy="440" r="6" />
+        <circle class="route-dot" cx="210" cy="270" r="5" />
+        <circle class="route-dot" cx="360" cy="150" r="5" />
+        <circle class="route-dot route-dot--end" cx="620" cy="70" r="7" />
+      </svg>
+
+      <div class="hero-content">
+        <h1 class="hero-title">Plan less.<br><em>Experience more.</em></h1>
+        <p class="hero-sub">Tell us where you're going and what you can spend. We verify real places, match hotels to
+          your budget, and lay out a day-by-day route with maps links included.</p>
+      </div>
+
+      <form class="trip-form" id="trip-form" novalidate>
+        <div class="form-row-header">
+          <h2>Where to?</h2>
+          <p class="form-hint">A full search runs behind this, so results take about a minute.</p>
+        </div>
+
+        <label class="field">
+          <span>Destination</span>
+          <input type="text" name="destination" id="destination" placeholder="Tokyo, Dubai, Sedona…" required
+            minlength="2" autocomplete="off">
+        </label>
+
+        <div class="dest-quick" aria-label="Popular destinations">
+          <span class="dest-quick-label">Popular</span>
+          <button type="button" class="dest-pill dest-tile" data-dest="Paris">Paris</button>
+          <button type="button" class="dest-pill dest-tile" data-dest="Tokyo">Tokyo</button>
+          <button type="button" class="dest-pill dest-tile" data-dest="Bali">Bali</button>
+          <button type="button" class="dest-pill dest-tile" data-dest="Dubai">Dubai</button>
+          <button type="button" class="dest-pill dest-tile" data-dest="New York">New York</button>
+          <button type="button" class="dest-pill dest-tile" data-dest="Rome">Rome</button>
+        </div>
+
+        <label class="field">
+          <span>Departing from <span class="field-optional">(optional — for flight info)</span></span>
+          <input type="text" name="origin" id="origin" placeholder="City or airport code" autocomplete="off">
+        </label>
+
+        <div class="field-pair">
+          <label class="field">
+            <span>Depart</span>
+            <input type="date" name="start_date" id="start_date" required>
+          </label>
+          <label class="field">
+            <span>Return</span>
+            <input type="date" name="end_date" id="end_date" required>
+          </label>
+        </div>
+        <p class="field-note" id="duration-note" aria-live="polite"></p>
+
+        <div class="field-pair">
+          <label class="field">
+            <span>Travelers</span>
+            <input type="number" name="travelers" id="travelers" min="1" max="20" value="2" required>
+          </label>
+          <label class="field">
+            <span>Currency</span>
+            <select name="currency" id="currency">
+              <option value="INR" selected>INR — Indian Rupee</option>
+              <option value="USD">USD — US Dollar</option>
+              <option value="EUR">EUR — Euro</option>
+              <option value="GBP">GBP — British Pound</option>
+              <option value="AED">AED — UAE Dirham</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="field">
+          <span>Total budget</span>
+          <div class="budget-input">
+            <span class="budget-symbol" id="budget-symbol">₹</span>
+            <input type="text" inputmode="numeric" name="budget_display" id="budget_display" value="50,000" required
+              aria-describedby="budget-words">
+          </div>
+          <span class="field-note" id="budget-words" aria-live="polite"></span>
+        </label>
+
+        <fieldset class="tier-field">
+          <legend>Pace &amp; comfort</legend>
+          <label class="tier-option">
+            <input type="radio" name="trip_tier" value="budget">
+            <span class="tier-name">Budget</span>
+            <span class="tier-desc">Lean spend, hostels and guesthouses</span>
+          </label>
+          <label class="tier-option">
+            <input type="radio" name="trip_tier" value="moderate" checked>
+            <span class="tier-name">Moderate</span>
+            <span class="tier-desc">Comfortable mid-range stays</span>
+          </label>
+          <label class="tier-option">
+            <input type="radio" name="trip_tier" value="comfort">
+            <span class="tier-name">Comfort</span>
+            <span class="tier-desc">Upscale hotels, easier pacing</span>
+          </label>
+        </fieldset>
+
+        <fieldset class="interests-field">
+          <legend>Interested in</legend>
+          <div class="chip-group" id="interests-group">
+            <label class="chip"><input type="checkbox" value="adventure" checked><span>Adventure</span></label>
+            <label class="chip"><input type="checkbox" value="photography" checked><span>Photography</span></label>
+            <label class="chip"><input type="checkbox" value="food" checked><span>Food</span></label>
+            <label class="chip"><input type="checkbox" value="history"><span>History</span></label>
+            <label class="chip"><input type="checkbox" value="nature"><span>Nature</span></label>
+            <label class="chip"><input type="checkbox" value="art_culture"><span>Art &amp; culture</span></label>
+            <label class="chip"><input type="checkbox" value="nightlife"><span>Nightlife</span></label>
+            <label class="chip"><input type="checkbox" value="shopping"><span>Shopping</span></label>
+          </div>
+        </fieldset>
+
+        <button type="submit" class="submit-btn" id="submit-btn">Plan the trip</button>
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+      </form>
+    </header>
+
+    <section class="assurances">
+      <p><strong>Real places, verified.</strong> No invented ratings — if we can't confirm it, we don't show it.</p>
+      <p><strong>Hotels matched to budget.</strong> Pricing and star tier checked before anything is recommended.</p>
+      <p><strong>Maps built in.</strong> Every stop links straight to Google Maps, no app switching required.</p>
+    </section>
+
+  </div>
+
+  <div class="loading-overlay" id="loading-overlay" hidden>
+    <div class="loading-card">
+      <svg class="loading-route" viewBox="0 0 200 60" aria-hidden="true">
+        <path d="M 10 45 C 40 20, 70 50, 100 25 S 160 10, 190 15" fill="none" stroke="var(--route-gold)"
+          stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 10" />
+        <circle cx="10" cy="45" r="4" fill="var(--route-gold)" />
+        <circle cx="190" cy="15" r="4" fill="var(--signal-teal)" />
+      </svg>
+      <p class="loading-status" id="loading-status" aria-live="polite">Searching verified places…</p>
+      <p class="loading-sub">This usually takes 45–90 seconds for a full itinerary.</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
