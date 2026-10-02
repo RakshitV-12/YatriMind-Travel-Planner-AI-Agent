@@ -140,7 +140,10 @@ class GoogleAuthRequest(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 @app.get("/index.html", response_class=HTMLResponse)
 async def home(request: Request):
-    """Serve the ticket-style frontend if available, else LangGraph template."""
+    """Serve the ticket-style frontend if authenticated, else redirect to login."""
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login.html", status_code=303)
     index_file = FRONTEND_DIR / "index.html"
     if index_file.exists():
         return HTMLResponse(content=index_file.read_text(encoding="utf-8"))
@@ -154,7 +157,10 @@ async def home(request: Request):
 @app.get("/results", response_class=HTMLResponse)
 @app.get("/results.html", response_class=HTMLResponse)
 async def results_page(request: Request):
-    """Serve the results page for the ticket-style frontend."""
+    """Serve the results page for the ticket-style frontend if authenticated, else redirect to login."""
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login.html?redirect=results.html", status_code=303)
     results_file = FRONTEND_DIR / "results.html"
     if results_file.exists():
         return HTMLResponse(content=results_file.read_text(encoding="utf-8"))
@@ -1970,7 +1976,7 @@ async def favicon():
 
 # Mount frontend directory at root for direct browser access
 if FRONTEND_DIR.exists():
-    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend_root")
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=False), name="frontend_root")
 
 
 if __name__ == "__main__":

@@ -393,12 +393,12 @@
 
     // 1. Immediately render local user from storage (zero UI delay)
     const localUser = getCurrentUser();
-    if (localUser) {
-      renderUserNav(localUser);
-      if (window.YatraSession) window.YatraSession.recordActivity(true);
-    } else {
-      renderUserNav(null);
+    if (!localUser) {
+      window.location.replace("login.html");
+      return;
     }
+    renderUserNav(localUser);
+    if (window.YatraSession) window.YatraSession.recordActivity(true);
 
     // 2. Validate in background with the backend
     fetch(`${getApiBase()}/api/auth/me`, { headers: getAuthHeaders(), credentials: "include" })
@@ -419,14 +419,15 @@
         }
       })
       .catch(() => {
-        // If unauthenticated by backend, clear stale credentials
+        // If unauthenticated by backend, clear stale credentials and redirect to login
         if (window.YatraSession) {
           window.YatraSession.clearSession();
         } else {
           localStorage.removeItem("yatramind_user");
           localStorage.removeItem("yatramind_token");
+          sessionStorage.clear();
         }
-        renderUserNav(null);
+        window.location.replace("login.html");
       });
   }
 

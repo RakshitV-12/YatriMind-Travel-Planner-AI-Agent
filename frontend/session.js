@@ -363,19 +363,28 @@
 
     // If on a content page (e.g. index.html, results.html)
     if (!isLoginPage) {
-      // 1. Immediately check if existing session has expired from prior inactivity
-      if (isLoggedIn() && isSessionExpired()) {
+      // 1. Enforce authentication: if not logged in, redirect to login page
+      if (!isLoggedIn()) {
+        console.log("[YatraSession] Unauthenticated. Redirecting to login.html...");
+        const currentPath = window.location.pathname.split("/").pop() || "index.html";
+        const redirectParam = (currentPath !== "index.html" && currentPath !== "")
+          ? `?redirect=${encodeURIComponent(currentPath + window.location.search)}`
+          : "";
+        window.location.replace(`login.html${redirectParam}`);
+        return;
+      }
+
+      // 2. Immediately check if existing session has expired from prior inactivity
+      if (isSessionExpired()) {
         console.warn("[YatraSession] Existing session expired during idle period. Redirecting to login...");
         logout({ reason: "timeout" });
         return;
       }
 
-      // 2. If logged in and valid, refresh activity timestamp so page load counts as active
-      if (isLoggedIn()) {
-        recordActivity(true);
-      }
+      // 3. If logged in and valid, refresh activity timestamp so page load counts as active
+      recordActivity(true);
 
-      // 3. Start listeners & periodic check loop
+      // 4. Start listeners & periodic check loop
       setupActivityListeners();
       if (checkIntervalId) clearInterval(checkIntervalId);
       checkIntervalId = setInterval(checkSessionInactivity, CHECK_INTERVAL_MS);

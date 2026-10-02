@@ -1388,6 +1388,10 @@
 
     // 1. Instant local render
     const localUser = getCurrentUser();
+    if (!localUser) {
+      window.location.replace("login.html?redirect=results.html");
+      return;
+    }
     renderNav(localUser);
     renderTicketTraveler();
     if (localUser && window.YatraSession) {
@@ -1419,9 +1423,9 @@
         } else {
           localStorage.removeItem("yatramind_user");
           localStorage.removeItem("yatramind_token");
+          sessionStorage.clear();
         }
-        renderNav(null);
-        renderTicketTraveler();
+        window.location.replace("login.html?redirect=results.html");
       });
   })();
 })();
