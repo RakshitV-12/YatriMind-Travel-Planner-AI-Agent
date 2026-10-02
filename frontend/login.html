@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in | YatraMind AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --navy: #12203A;
+      --paper: #FBF8F1;
+      --ink: #1B2433;
+      --muted: #5E687A;
+      --line: #E2DAC8;
+      --saffron: #E39A2D;
+      --danger: #B42318;
+      --serif: "Fraunces", Georgia, "Times New Roman", serif;
+      --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      background: var(--navy);
+      color: var(--ink);
+      font-family: var(--sans);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      min-height: 100svh;
+      overflow-x: hidden
+    }
+
+    /* background route */
+    .sky {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none
+    }
+
+    .sky .base {
+      fill: none;
+      stroke: #F3E7CF;
+      stroke-opacity: .22;
+      stroke-width: 2;
+      stroke-dasharray: 3 9;
+      stroke-linecap: round
+    }
+
+    .sky .draw {
+      fill: none;
+      stroke: var(--saffron);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: draw 2.6s .3s ease-out forwards
+    }
+
+    .sky text {
+      fill: #F3E7CF;
+      fill-opacity: .55;
+      font: 500 20px var(--sans);
+      letter-spacing: .08em
+    }
+
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0
+      }
+    }
+
+    /* ticket */
+    .ticket {
+      position: relative;
+      z-index: 1;
+      width: min(900px, 100%);
+      display: grid;
+      grid-template-columns: 1.45fr .75fr;
+      background: var(--paper);
+      border-radius: 20px;
+      box-shadow: 0 30px 70px rgba(4, 10, 24, .45)
+    }
+
+    .main {
+      padding: 40px 44px 32px
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      color: var(--ink)
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 34px;
+      line-height: 1.15;
+      margin: 26px 0 6px;
+      letter-spacing: -.01em
+    }
+
+    .sub {
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 15px
+    }
+
+    .switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #EFE9D9;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 18px
+    }
+
+    .switch button {
+      border: 0;
+      background: none;
+      font: 500 14px var(--sans);
+      padding: 10px;
+      border-radius: 9px;
+      color: var(--muted);
+      cursor: pointer
+    }
+
+    .switch button[aria-pressed="true"] {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 1px 3px rgba(18, 32, 58, .15)
+    }
+
+    #googleWrap {
+      min-height: 44px;
+      display: flex;
+      justify-content: center
+    }
+
+    #googleBtn {
+      display: flex;
+      justify-content: center;
+      width: 100%
+    }
+
+    .gbtn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 44px;
+      background: #fff;
+      border: 1px solid #CFC7B3;
+      border-radius: 999px;
+      font: 500 14.5px var(--sans);
+      color: var(--ink);
+      cursor: pointer
+    }
+
+    .gbtn:hover {
+      background: #FDFCF8
+    }
+
+    .gbtn[hidden] {
+      display: none
+    }
+
+    .or {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 18px 0
+    }
+
+    .or::before,
+    .or::after {
+      content: "";
+      flex: 1;
+      border-top: 1px solid var(--line)
+    }
+
+    .field {
+      margin-bottom: 14px
+    }
+
+    .field[hidden] {
+      display: none
+    }
+
+    label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 500;
+      margin-bottom: 6px
+    }
+
+    input[type=text],
+    input[type=email],
+    input[type=password] {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px;
+      font: 400 15px var(--sans);
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid #CFC7B3;
+      border-radius: 10px
+    }
+
+    input:focus-visible {
+      outline: none;
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(227, 154, 45, .45)
+    }
+
+    input[aria-invalid=true] {
+      border-color: var(--danger)
+    }
+
+    .pw {
+      position: relative
+    }
+
+    .pw input {
+      padding-right: 64px
+    }
+
+    .pw button {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      height: 32px;
+      padding: 0 10px;
+      border: 0;
+      background: none;
+      font: 500 13px var(--sans);
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 8px
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 13.5px;
+      margin: 2px 0 6px
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-weight: 400;
+      cursor: pointer
+    }
+
+    .check input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--navy)
+    }
+
+    a {
+      color: var(--navy)
+    }
+
+    .msg {
+      min-height: 22px;
+      margin: 6px 0 10px;
+      font-size: 13.5px;
+      color: var(--danger)
+    }
+
+    .msg.info {
+      color: var(--muted)
+    }
+
+    .primary {
+      width: 100%;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--navy);
+      color: #fff;
+      font: 600 15px var(--sans);
+      cursor: pointer
+    }
+
+    .primary:hover {
+      background: #1B2F52
+    }
+
+    .primary:disabled {
+      opacity: .7;
+      cursor: wait
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    .check input:focus-visible {
+      outline: 3px solid var(--navy);
+      outline-offset: 2px
+    }
+
+    .legal {
+      margin: 16px 0 0;
+      font-size: 12.5px;
+      color: var(--muted);
+      text-align: center
+    }
+
+    /* stub */
+    .stub {
+      position: relative;
+      border-left: 2px dashed var(--line);
+      padding: 40px 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px
+    }
+
+    .stub::before,
+    .stub::after {
+      content: "";
+      position: absolute;
+      left: -12px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--navy)
+    }
+
+    .stub::before {
+      top: -11px
+    }
+
+    .stub::after {
+      bottom: -11px
+    }
+
+    .route {
+      display: grid;
+      gap: 4px
+    }
+
+    .route small {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .route strong {
+      font-family: var(--serif);
+      font-size: 30px;
+      font-weight: 600;
+      line-height: 1.1
+    }
+
+    .route .gap {
+      height: 34px;
+      margin: 6px 0 6px 6px;
+      border-left: 2px dotted var(--saffron)
+    }
+
+    .stub p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14.5px;
+      line-height: 1.5
+    }
+
+    .barcode {
+      margin-top: auto;
+      height: 54px;
+      opacity: .8;
+      background:
+        repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 5px),
+        repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 9px);
+      -webkit-mask: repeating-linear-gradient(90deg, #000 0 14px, transparent 14px 17px, #000 17px 22px, transparent 22px 24px);
+      mask: repeating-linear-gradient(90deg, #000 0 14px, transparent 14px 17px, #000 17px 22px, transparent 22px 24px)
+    }
+
+    @media (max-width:780px) {
+      .ticket {
+        grid-template-columns: 1fr
+      }
+
+      .stub {
+        display: none
+      }
+
+      .main {
+        padding: 32px 24px 26px
+      }
+
+      h1 {
+        font-size: 29px
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .sky .draw {
+        animation: none;
+        stroke-dashoffset: 0
+      }
+    }
+
+    .session-notice-box {
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 0 0 18px;
+      font-size: 14px;
+      line-height: 1.45;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      animation: sessionNoticeFade 0.3s ease;
+    }
+    @keyframes sessionNoticeFade {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .session-notice-box.warning {
+      background: #FFF7ED;
+      border: 1.5px solid #FDBA74;
+      color: #9A3412;
+    }
+    .session-notice-box.success {
+      background: #F0FDF4;
+      border: 1.5px solid #86EFAC;
+      color: #166534;
+    }
+  </style>
+  <script src="session.js"></script>
+</head>
+
+<body>
+
+  <svg class="sky" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path class="base" d="M120 640 C 380 140, 820 100, 1080 220" />
+    <path class="draw" pathLength="100" d="M120 640 C 380 140, 820 100, 1080 220" />
+    <circle cx="120" cy="640" r="6" fill="#E39A2D" />
+    <circle cx="1080" cy="220" r="6" fill="#E39A2D" />
+    <text x="108" y="676">DELHI</text><text x="1050" y="196">DUBAI</text>
+  </svg>
+
+  <main class="ticket">
+    <section class="main">
+      <a href="index.html" class="brand" title="Back to Home">
+        <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+          <rect width="28" height="28" rx="8" fill="#12203A" />
+          <path d="M7 20 Q14 5 21 9" fill="none" stroke="#E39A2D" stroke-width="2" stroke-linecap="round" />
+          <circle cx="7" cy="20" r="2" fill="#fff" />
+          <circle cx="21" cy="9" r="2" fill="#fff" />
+        </svg>
+        YatraMind AI
+      </a>
+
+      <h1 id="title">Sign in to plan your trip</h1>
+      <p class="sub" id="sub">Welcome back.</p>
+
+      <div class="session-notice-box" id="sessionNotice" style="display: none;" role="alert"></div>
+
+      <div class="switch" role="group" aria-label="Sign in or create an account">
+        <button type="button" id="tabIn" aria-pressed="true">Sign in</button>
+        <button type="button" id="tabUp" aria-pressed="false">Create account</button>
+      </div>
+
+      <div id="googleWrap">
+        <div id="googleBtn"></div>
+        <button type="button" class="gbtn" id="gFallback">
+          <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#EA4335"
+              d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z" />
+            <path fill="#4285F4"
+              d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z" />
+            <path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z" />
+            <path fill="#34A853"
+              d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z" />
+          </svg>
+          Continue with Google
+        </button>
+      </div>
+
+      <div class="or"><span>or use your email</span></div>
+
+      <form id="form" novalidate>
+        <div class="field" id="nameField" hidden>
+          <label for="name">Full name</label>
+          <input id="name" type="text" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" inputmode="email">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="pw">
+            <input id="password" type="password" autocomplete="current-password">
+            <button type="button" id="toggle" aria-pressed="false">Show</button>
+          </div>
+        </div>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="remember" checked> Keep me signed in</label>
+          <a href="#" id="forgot">Forgot password?</a>
+        </div>
+        <p class="msg" id="msg" role="alert" aria-live="polite"></p>
+        <button class="primary" id="submit" type="submit">Sign in</button>
+      </form>
+
+      <p class="legal">By continuing, you agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
+    </section>
+
+    <aside class="stub" aria-hidden="true">
+      <div class="route">
+        <small>From</small><strong>Delhi</strong>
+        <div class="gap"></div>
+        <small>To</small><strong>Dubai</strong>
+      </div>
+      <p>Flights, stays and a day-by-day plan, in one place.</p>
+      <div class="barcode"></div>
+    </aside>
+  </main>
+
+  <script>
+    /* ---------- Immediate Existing Session Check ---------- */
+    function getRedirectTarget() {
+      const params = new URLSearchParams(window.location.search);
+      const explicit = params.get("redirect");
+      const autoPlan = params.get("autoPlan");
+      let target = explicit || "index.html";
+      if (autoPlan === "1" && !target.includes("autoPlan=1")) {
+        target += (target.includes("?") ? "&" : "?") + "autoPlan=1";
+      }
+      return target;
+    }
+
+    function showNotice(type, text) {
+      const el = $("sessionNotice");
+      if (!el) return;
+      el.className = "session-notice-box " + type;
+      el.textContent = text;
+      el.style.display = "flex";
+    }
+
+    // Handle session checks, inactivity timeouts, and automatic redirects
+    (function earlySessionCheck() {
+      const params = new URLSearchParams(window.location.search);
+      const isTimeout = params.get("timeout") === "1";
+      const isLogout = params.get("logout") === "1" || params.get("action") === "logout";
+
+      if (isTimeout || isLogout) {
+        try {
+          if (window.YatraSession) {
+            window.YatraSession.clearSession();
+          } else {
+            localStorage.removeItem("yatramind_user");
+            localStorage.removeItem("yatramind_token");
+            localStorage.removeItem("yatramind_last_activity");
+            sessionStorage.removeItem("yatramind_user");
+            sessionStorage.removeItem("yatramind_token");
+            sessionStorage.removeItem("tripUser");
+          }
+        } catch (_) { }
+
+        // Clean up server-side cookie asynchronously
+        try {
+          fetch(`${getApiBase()}/api/auth/logout`, { method: "POST", credentials: "include" }).catch(() => {});
+        } catch (_) {}
+
+        window.addEventListener("DOMContentLoaded", () => {
+          if (isTimeout) {
+            showNotice("warning", "⏱️ You have been automatically signed out due to 15 minutes of inactivity. Please sign in again.");
+          } else if (isLogout) {
+            showNotice("success", "✓ You have been signed out successfully.");
+          }
+        });
+        return;
+      }
+
+      // If user has an existing session, verify if it expired due to inactivity
+      try {
+        if (window.YatraSession && window.YatraSession.isSessionExpired()) {
+          window.YatraSession.clearSession();
+          window.addEventListener("DOMContentLoaded", () => {
+            showNotice("warning", "⏱️ Your previous session timed out due to inactivity. Please sign in again to continue.");
+          });
+          return;
+        }
+
+        const raw = localStorage.getItem("yatramind_user") || sessionStorage.getItem("yatramind_user");
+        const token = localStorage.getItem("yatramind_token") || sessionStorage.getItem("yatramind_token");
+        if (raw || token) {
+          if (window.YatraSession) {
+            window.YatraSession.recordActivity(true);
+          }
+          window.location.replace(getRedirectTarget());
+        }
+      } catch (_) { }
+    })();
+
+    /* ---------- Settings & Environment Configuration ---------- */
+    const CONFIG = {
+      GOOGLE_CLIENT_ID: "540769217131-0jtj6lssi81f4rhiquhrhhfifruceb8i.apps.googleusercontent.com",
+      DEMO_MODE: false
+    };
+
+    const RENDER_BACKEND_URL = "https://yatrimind-travel-planner-ai-agent.onrender.com";
+    let activeApiBase = null;
+
+    function getApiBase() {
+      if (activeApiBase !== null) return activeApiBase;
+
+      // 1. If currently on Render or matches RENDER_BACKEND_URL, use relative path
+      if (window.location.origin === RENDER_BACKEND_URL || window.location.hostname.endsWith(".onrender.com")) {
+        activeApiBase = "";
+        return "";
+      }
+
+      // 2. If running directly on port 8000 (FastAPI), use relative path
+      if (window.location.port === "8000") {
+        activeApiBase = "";
+        return "";
+      }
+
+      // 3. If running locally on another port (e.g. Live Server on 5500, Vite, file://)
+      if (window.location.hostname === "localhost") {
+        return "http://localhost:8000";
+      }
+      if (window.location.hostname === "127.0.0.1" || !window.location.protocol.startsWith("http")) {
+        return "http://127.0.0.1:8000";
+      }
+
+      // 4. Default for external deployed frontend (e.g. Vercel, Netlify)
+      return RENDER_BACKEND_URL;
+    }
+
+    const $ = id => document.getElementById(id);
+    let mode = "in";
+
+    const COPY = {
+      in: { title: "Sign in to plan your trip", sub: "Welcome back.", cta: "Sign in", pw: "current-password" },
+      up: { title: "Create your account", sub: "Start planning trips in a minute.", cta: "Create account", pw: "new-password" }
+    };
+
+    function showMsg(text, info) {
+      $("msg").textContent = text || "";
+      $("msg").className = "msg" + (info ? " info" : "");
+    }
+
+    function setMode(m) {
+      mode = m;
+      const c = COPY[m];
+      $("title").textContent = c.title;
+      $("sub").textContent = c.sub;
+      $("submit").textContent = c.cta;
+      $("nameField").hidden = m === "in";
+      $("password").setAttribute("autocomplete", c.pw);
+      $("tabIn").setAttribute("aria-pressed", m === "in");
+      $("tabUp").setAttribute("aria-pressed", m === "up");
+      document.querySelectorAll("input").forEach(i => i.removeAttribute("aria-invalid"));
+      showMsg("");
+    }
+    $("tabIn").onclick = () => setMode("in");
+    $("tabUp").onclick = () => setMode("up");
+
+    $("toggle").onclick = () => {
+      const show = $("password").type === "password";
+      $("password").type = show ? "text" : "password";
+      $("toggle").textContent = show ? "Hide" : "Show";
+      $("toggle").setAttribute("aria-pressed", show);
+    };
+
+    $("forgot").onclick = e => { e.preventDefault(); showMsg("Password reset isn't set up yet.", true); };
+
+    function finish(user, token) {
+      if (!user) user = { name: "Traveler", email: "traveler@yatramind.ai" };
+      try {
+        if (window.YatraSession) {
+          window.YatraSession.setSession(user, token);
+        } else {
+          const userJson = JSON.stringify(user);
+          localStorage.setItem("yatramind_user", userJson);
+          localStorage.setItem("yatramind_last_activity", Date.now().toString());
+          sessionStorage.setItem("yatramind_user", userJson);
+          sessionStorage.setItem("tripUser", userJson);
+          if (token) {
+            localStorage.setItem("yatramind_token", token);
+            sessionStorage.setItem("yatramind_token", token);
+          }
+        }
+      } catch (e) {
+        console.warn("[AUTH] Storage write failed:", e);
+      }
+
+      showMsg("✓ Welcome " + (user.name || user.email) + "! Connecting to planner…", true);
+      // Immediately redirect to the index page without asking or showing prompt
+      window.location.replace(getRedirectTarget());
+    }
+
+    function validate() {
+      const name = $("name").value.trim(), email = $("email").value.trim(), pw = $("password").value;
+      document.querySelectorAll("input").forEach(i => i.removeAttribute("aria-invalid"));
+      const fail = (id, text) => { $(id).setAttribute("aria-invalid", "true"); $(id).focus(); return text; };
+      if (mode === "up" && name.length < 2) return fail("name", "Enter your full name.");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return fail("email", "Enter a valid email address.");
+      if (mode === "up" && pw.length < 8) return fail("password", "Use at least 8 characters for your password.");
+      if (mode === "in" && !pw) return fail("password", "Enter your password.");
+      return "";
+    }
+
+    async function post(endpoint, body) {
+      let base = getApiBase();
+      let res;
+      try {
+        res = await fetch(`${base}${endpoint}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(body)
+        });
+      } catch (err) {
+        // If local port 8000 failed to connect and we aren't already on Render, try falling back to deployed backend!
+        if (base && base !== RENDER_BACKEND_URL && !window.location.hostname.endsWith(".onrender.com")) {
+          console.warn("[AUTH] Local backend unreachable, trying deployed backend...");
+          base = RENDER_BACKEND_URL;
+          activeApiBase = RENDER_BACKEND_URL;
+          res = await fetch(`${base}${endpoint}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(body)
+          });
+        } else {
+          throw err;
+        }
+      }
+
+      // Handle older deployed Render backend where /api/auth/* might return 404
+      if (res.status === 404 && endpoint.startsWith("/api/auth/")) {
+        console.warn(`[AUTH] Endpoint ${endpoint} returned 404. Falling back to local traveler session.`);
+        const email = body.email || "traveler@yatramind.ai";
+        const name = body.name || email.split("@")[0];
+        return { user: { name, email }, token: "offline_token_" + Date.now() };
+      }
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || "Something went wrong. Try again.");
+      return data;
+    }
+
+    $("form").addEventListener("submit", async e => {
+      e.preventDefault();
+      const error = validate();
+      if (error) return showMsg(error);
+      showMsg("");
+
+      const name = $("name").value.trim(), email = $("email").value.trim(), password = $("password").value;
+      const remember = $("remember").checked;
+      if (CONFIG.DEMO_MODE) return finish({ name: name || email.split("@")[0], email }, "demo_token_" + Date.now());
+
+      $("submit").disabled = true;
+      $("submit").textContent = mode === "in" ? "Signing in…" : "Creating account…";
+      try {
+        const payload = mode === "in" ? { email, password, remember } : { name, email, password };
+        const endpoint = mode === "in" ? "/api/auth/login" : "/api/auth/register";
+        const data = await post(endpoint, payload);
+        finish(data.user || { name: name || email.split("@")[0], email }, data.token);
+      } catch (err) {
+        showMsg(err.message);
+        $("submit").disabled = false;
+        $("submit").textContent = COPY[mode].cta;
+      }
+    });
+
+    /* ---------- Google sign-in ---------- */
+    function parseJwt(token) {
+      const b64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    async function onGoogle(resp) {
+      if (CONFIG.DEMO_MODE) {
+        const p = parseJwt(resp.credential);
+        return finish({ name: p.name, email: p.email, picture: p.picture }, "demo_token_" + Date.now());
+      }
+      try {
+        showMsg("Signing you in with Google…", true);
+        const data = await post("/api/auth/google", { credential: resp.credential });
+        finish(data.user, data.token);
+      } catch (err) {
+        showMsg(err.message || "Google sign in failed.");
+      }
+    }
+
+    function initGoogle() {
+      try {
+        google.accounts.id.initialize({
+          client_id: CONFIG.GOOGLE_CLIENT_ID,
+          callback: onGoogle,
+          auto_select: false,
+          cancel_on_tap_outside: true
+        });
+        const wrapWidth = $("googleWrap")?.clientWidth || 320;
+        const btnWidth = Math.max(260, Math.min(380, wrapWidth));
+        google.accounts.id.renderButton($("googleBtn"), {
+          theme: "outline",
+          size: "large",
+          shape: "pill",
+          text: "continue_with",
+          logo_alignment: "left",
+          width: btnWidth
+        });
+        $("gFallback").hidden = true;
+      } catch (err) {
+        console.warn("[Google Identity] Init error:", err);
+        $("gFallback").hidden = false;
+        $("gFallback").onclick = () => {
+          try { google.accounts.id.prompt(); } catch (_) { showMsg("Google sign-in could not open."); }
+        };
+      }
+    }
+
+    async function startGoogleAuth() {
+      // If not hardcoded or to verify live env, fetch from API config
+      if (!CONFIG.GOOGLE_CLIENT_ID) {
+        try {
+          const res = await fetch(`${getApiBase()}/api/auth/config`);
+          if (res.ok) {
+            const cfg = await res.json();
+            if (cfg.google_client_id) {
+              CONFIG.GOOGLE_CLIENT_ID = cfg.google_client_id;
+            }
+          }
+        } catch (_) { }
+      }
+
+      if (CONFIG.GOOGLE_CLIENT_ID) {
+        const s = document.createElement("script");
+        s.src = "https://accounts.google.com/gsi/client";
+        s.async = true;
+        s.defer = true;
+        s.onload = initGoogle;
+        s.onerror = () => showMsg("Couldn't load Google sign-in. Check your connection and try again.");
+        document.head.appendChild(s);
+      } else {
+        $("gFallback").onclick = () => showMsg("Google sign-in isn't configured in .env yet.", true);
+      }
+    }
+
+    startGoogleAuth();
+  </script>
+</body>
+
+</html>

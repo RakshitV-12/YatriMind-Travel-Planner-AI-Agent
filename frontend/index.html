@@ -24,7 +24,12 @@
         </svg>
         <span>YATRMIND TRAVEL AI AGENT</span>
       </a>
-      <span class="nav-tagline">AI travel planner</span>
+      <div class="nav-actions">
+        <span class="nav-tagline">AI travel planner</span>
+        <div id="nav-auth-slot">
+          <a href="login.html" class="nav-auth-btn" id="nav-login-btn">Sign in</a>
+        </div>
+      </div>
     </nav>
 
     <header class="hero">
@@ -41,6 +46,10 @@
         <h1 class="hero-title">Plan less.<br><em>Experience more.</em></h1>
         <p class="hero-sub">Tell us where you're going and what you can spend. We verify real places, match hotels to
           your budget, and lay out a day-by-day route with maps links included.</p>
+        <div class="user-greeting-banner" id="user-greeting-banner" style="display: none;">
+          <span class="greeting-icon">✈</span>
+          <span class="greeting-text">Welcome back, <strong id="greeting-user-name">Traveler</strong>! Where will your journey take you?</span>
+        </div>
       </div>
 
       <form class="trip-form" id="trip-form" novalidate>
@@ -168,6 +177,7 @@
     </div>
   </div>
 
+  <script src="session.js"></script>
   <script src="app.js"></script>
 </body>
 

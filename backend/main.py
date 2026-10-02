@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.concurrency import run_in_threadpool
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from groq import Groq
@@ -26,6 +26,7 @@ from pydantic import BaseModel
 
 from backend.agent import run_travel_agent
 from backend.ana_chat import compass_companion, ana_companion
+from backend.auth import auth_router, get_current_user, clear_session_cookie
 from tools.tavily_tool import tavily_search, tavily_search_with_images
 from tools.flight_tool import search_flights_structured, find_nearest_departure_hubs, resolve_location_to_iata
 
@@ -39,15 +40,35 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS for all local origins
+# Enable CORS for all local and deployed origins with full credentials support
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origin_regex=r".*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     allow_private_network=True,
 )
+
+# Register Authentication endpoints
+app.include_router(auth_router)
+
+# Enforce authentication: protect API routes with 401
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    # 1. CRITICAL: Never block preflight OPTIONS requests! Browsers send OPTIONS without auth.
+    if request.method == "OPTIONS":
+        return await call_next(request)
+
+    path = request.url.path
+
+    # 2. Only protect /api/ endpoints, excluding /api/auth/ and /health
+    if path.startswith("/api/") and not path.startswith("/api/auth"):
+        user = get_current_user(request)
+        if not user:
+            return JSONResponse(status_code=401, content={"detail": "Not authenticated. Please sign in."})
+
+    return await call_next(request)
 
 # Mount static directory for LangGraph chat interface
 if (BASE_DIR / "static").exists():
@@ -97,6 +118,21 @@ class TripPlanRequest(BaseModel):
     trip_tier: str = "Standard"
 
 
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class RegisterRequest(BaseModel):
+    name: str | None = None
+    email: str
+    password: str
+
+
+class GoogleAuthRequest(BaseModel):
+    credential: str
+
+
 # ============================================================================
 # Frontend UI Routes
 # ============================================================================
@@ -117,12 +153,37 @@ async def home(request: Request):
 
 @app.get("/results", response_class=HTMLResponse)
 @app.get("/results.html", response_class=HTMLResponse)
-async def results_page():
+async def results_page(request: Request):
     """Serve the results page for the ticket-style frontend."""
     results_file = FRONTEND_DIR / "results.html"
     if results_file.exists():
         return HTMLResponse(content=results_file.read_text(encoding="utf-8"))
     return HTMLResponse(content="<h1>Results page not found</h1>", status_code=404)
+
+
+@app.get("/login", response_class=HTMLResponse)
+@app.get("/login.html", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """Serve the boarding-pass style login page."""
+    login_file = FRONTEND_DIR / "login.html"
+    if not login_file.exists():
+        return HTMLResponse(content="<h1>Login page not found</h1>", status_code=404)
+
+    is_logout_or_timeout = (
+        request.query_params.get("logout") == "1"
+        or request.query_params.get("timeout") == "1"
+        or request.query_params.get("action") == "logout"
+    )
+    if is_logout_or_timeout:
+        resp = HTMLResponse(content=login_file.read_text(encoding="utf-8"))
+        clear_session_cookie(resp)
+        return resp
+
+    user = get_current_user(request)
+    if user:
+        return RedirectResponse(url="/", status_code=303)
+
+    return HTMLResponse(content=login_file.read_text(encoding="utf-8"))
 
 
 @app.get("/style.css")
@@ -131,6 +192,14 @@ async def style_css():
     if css_file.exists():
         return FileResponse(css_file, media_type="text/css")
     return JSONResponse(status_code=404, content={"error": "style.css not found"})
+
+
+@app.get("/session.js")
+async def session_js():
+    js_file = FRONTEND_DIR / "session.js"
+    if js_file.exists():
+        return FileResponse(js_file, media_type="application/javascript")
+    return JSONResponse(status_code=404, content={"error": "session.js not found"})
 
 
 @app.get("/app.js")

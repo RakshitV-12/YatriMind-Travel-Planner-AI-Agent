@@ -1,7 +1,36 @@
-# Environments
+# Git
+.git
+.gitignore
+
+# Environments & Python Artifacts
 .venv
 env/
 venv/
 ENV/
-env.bak/
-venv.bak/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Secrets, Databases & User State
+.env
+.env.*
+!.env.example
+auth_users.json
+.auth_secret
+users.json
+checkpoints.json
+*.sqlite
+*.sqlite3
+
+# Scratchpad, Logs & IDE
+scratch/
+scratch/*
+scratch/**
+test.py
+test_*.py
+debug_*.py
+*.log
+.vscode/
+.idea/

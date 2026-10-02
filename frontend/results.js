@@ -1,6 +1,82 @@
 (function () {
   "use strict";
 
+  const RENDER_BACKEND_URL = "https://yatrimind-travel-planner-ai-agent.onrender.com";
+  let activeApiBase = null;
+
+  function getApiBase() {
+    if (activeApiBase !== null) return activeApiBase;
+
+    // 1. If currently on Render or matches RENDER_BACKEND_URL, use relative origin
+    if (window.location.origin === RENDER_BACKEND_URL || window.location.hostname.endsWith(".onrender.com")) {
+      activeApiBase = "";
+      return "";
+    }
+
+    // 2. If running directly on port 8000 (FastAPI), use relative origin
+    if (window.location.port === "8000") {
+      activeApiBase = "";
+      return "";
+    }
+
+    // 3. If running locally on another port (e.g. Live Server on 5500, Vite, file://)
+    if (window.location.hostname === "localhost") {
+      return "http://localhost:8000";
+    }
+    if (window.location.hostname === "127.0.0.1" || !window.location.protocol.startsWith("http")) {
+      return "http://127.0.0.1:8000";
+    }
+
+    // 4. Default for external deployed frontend (e.g. Vercel, Netlify)
+    return RENDER_BACKEND_URL;
+  }
+
+  function getAuthToken() {
+    if (window.YatraSession) return window.YatraSession.getToken();
+    return localStorage.getItem("yatramind_token") || sessionStorage.getItem("yatramind_token") || "";
+  }
+
+  function getCurrentUser() {
+    if (window.YatraSession) return window.YatraSession.getUser();
+    try {
+      const raw = sessionStorage.getItem("tripUser") || localStorage.getItem("yatramind_user") || sessionStorage.getItem("yatramind_user");
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function getAuthHeaders(extraHeaders = {}) {
+    if (window.YatraSession) return window.YatraSession.getAuthHeaders(extraHeaders);
+    const headers = { "Content-Type": "application/json", ...extraHeaders };
+    const token = getAuthToken();
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    return headers;
+  }
+
+  function renderTicketTraveler() {
+    const user = getCurrentUser();
+    const badge = document.getElementById("ticket-traveler-badge");
+    const nameEl = document.getElementById("ticket-traveler-name");
+    const avatarEl = document.getElementById("ticket-traveler-avatar");
+    if (!badge || !nameEl) return;
+
+    if (user && (user.name || user.email)) {
+      const displayName = user.name || user.email.split("@")[0];
+      nameEl.textContent = displayName;
+      if (user.picture && avatarEl) {
+        avatarEl.innerHTML = `<img src="${user.picture}" alt="${displayName}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;">`;
+      } else if (avatarEl) {
+        avatarEl.textContent = (displayName[0] || "U").toUpperCase();
+      }
+      badge.style.display = "inline-flex";
+    } else {
+      badge.style.display = "none";
+    }
+  }
+
   const CURRENCY_SYMBOLS = { INR: "₹", USD: "$", EUR: "€", GBP: "£", AED: "AED " };
 
   function formatIndian(numStr) {
@@ -1030,20 +1106,7 @@
   // Replies are advice only -- nothing here edits the itinerary on screen.
   (function initAna() {
     function getAnaApiUrl() {
-      const RENDER_BACKEND_URL = "https://yatrimind-travel-planner-ai-agent.onrender.com";
-
-      if (window.location.origin === RENDER_BACKEND_URL) {
-        return "/api/chat";
-      }
-
-      if (
-        window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1"
-      ) {
-        return "http://127.0.0.1:8000/api/chat";
-      }
-
-      return `${RENDER_BACKEND_URL}/api/chat`;
+      return `${getApiBase()}/api/chat`;
     }
 
     const fab = document.getElementById("ana-fab");
@@ -1070,7 +1133,12 @@
     function itineraryContext() {
       try {
         if (!data || typeof data !== "object") return "";
-        const lines = [`I'm looking at a ${data.duration || ""} itinerary for ${data.destination || (payload && payload.destination) || "my trip"}, budget ${data.estimated_budget || "?"} ${currency}.`];
+        const traveler = getCurrentUser();
+        const travelerName = traveler ? (traveler.name || traveler.email.split("@")[0]) : "";
+        const lines = [
+          travelerName ? `The traveler's name is ${travelerName}.` : "",
+          `I'm looking at a ${data.duration || ""} itinerary for ${data.destination || (payload && payload.destination) || "my trip"}, budget ${data.estimated_budget || "?"} ${currency}.`
+        ].filter(Boolean);
         const safeDays = Array.isArray(days) ? days : (data.days && Array.isArray(data.days) ? data.days : []);
         safeDays.forEach((d, i) => {
           if (!d) return;
@@ -1212,12 +1280,37 @@
       };
       primed = true;
       try {
-        const endpoint = getAnaApiUrl();
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+        let base = getApiBase();
+        let endpoint = `${base}/api/chat`;
+        let res;
+        try {
+          res = await fetch(endpoint, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            credentials: "include",
+            body: JSON.stringify(payload),
+          });
+        } catch (fetchErr) {
+          if (base && base !== RENDER_BACKEND_URL && !window.location.hostname.endsWith(".onrender.com")) {
+            console.warn("[COMPASS] Local backend unreachable, trying deployed backend...");
+            base = RENDER_BACKEND_URL;
+            activeApiBase = RENDER_BACKEND_URL;
+            endpoint = `${base}/api/chat`;
+            res = await fetch(endpoint, {
+              method: "POST",
+              headers: getAuthHeaders(),
+              credentials: "include",
+              body: JSON.stringify(payload),
+            });
+          } else {
+            throw fetchErr;
+          }
+        }
+
+        if (res.status === 401) {
+          window.location.href = "login.html?redirect=results.html";
+          return;
+        }
         const body = await res.json();
         if (!res.ok || !body.success) throw new Error(body.error || `Request failed (${res.status})`);
         threadId = body.thread_id || threadId;
@@ -1249,5 +1342,86 @@
         send(text || chip.textContent.trim());
       }
     });
+  })();
+
+  // ---------- User Session & Profile on Results Page ----------
+  (function initUserSession() {
+    const slot = document.getElementById("nav-auth-slot");
+    if (!slot) return;
+
+    function renderNav(user) {
+      if (user && (user.name || user.email)) {
+        const displayName = user.name || user.email.split("@")[0];
+        const initial = (displayName[0] || "U").toUpperCase();
+        slot.innerHTML = `
+          <div class="nav-user-pill">
+            <span class="nav-user-avatar">${user.picture ? `<img src="${user.picture}" alt="${displayName}">` : initial}</span>
+            <span class="nav-user-name">${displayName}</span>
+            <button type="button" class="nav-signout-btn" id="nav-signout-btn" title="Sign out">Log out</button>
+          </div>
+        `;
+        document.getElementById("nav-signout-btn")?.addEventListener("click", () => {
+          if (window.YatraSession) {
+            window.YatraSession.logout({ reason: "manual" });
+          } else {
+            fetch(`${getApiBase()}/api/auth/logout`, { method: "POST", headers: getAuthHeaders(), credentials: "include" }).catch(() => {});
+            localStorage.removeItem("yatramind_user");
+            localStorage.removeItem("yatramind_token");
+            sessionStorage.removeItem("yatramind_user");
+            sessionStorage.removeItem("yatramind_token");
+            sessionStorage.removeItem("tripUser");
+            renderNav(null);
+            renderTicketTraveler();
+            window.location.href = "login.html?logout=1";
+          }
+        });
+      } else {
+        slot.innerHTML = `<a href="login.html" class="nav-auth-btn" id="nav-login-btn">Sign in</a>`;
+      }
+    }
+
+    // 0. Verify if existing session has expired from inactivity
+    if (window.YatraSession && window.YatraSession.isSessionExpired()) {
+      window.YatraSession.logout({ reason: "timeout" });
+      return;
+    }
+
+    // 1. Instant local render
+    const localUser = getCurrentUser();
+    renderNav(localUser);
+    renderTicketTraveler();
+    if (localUser && window.YatraSession) {
+      window.YatraSession.recordActivity(true);
+    }
+
+    // 2. Validate in background
+    fetch(`${getApiBase()}/api/auth/me`, { headers: getAuthHeaders(), credentials: "include" })
+      .then(res => {
+        if (!res.ok) throw new Error("Unauthenticated");
+        return res.json();
+      })
+      .then(data => {
+        if (data.user) {
+          if (window.YatraSession) {
+            window.YatraSession.setSession(data.user, getAuthToken());
+          } else {
+            const userJson = JSON.stringify(data.user);
+            localStorage.setItem("yatramind_user", userJson);
+            sessionStorage.setItem("yatramind_user", userJson);
+          }
+          renderNav(data.user);
+          renderTicketTraveler();
+        }
+      })
+      .catch(() => {
+        if (window.YatraSession) {
+          window.YatraSession.clearSession();
+        } else {
+          localStorage.removeItem("yatramind_user");
+          localStorage.removeItem("yatramind_token");
+        }
+        renderNav(null);
+        renderTicketTraveler();
+      });
   })();
 })();

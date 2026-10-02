@@ -23,12 +23,31 @@
       <a class="submit-btn" href="index.html">Plan a trip</a>
     </div>
 
+    <nav class="site-nav" aria-label="Site" style="border-radius: var(--radius-card); margin-bottom: 20px;">
+      <a class="brand" href="index.html">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M3 25 L12 9 L17 18 L21 12 L29 25 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" />
+        </svg>
+        <span>YATRMIND TRAVEL AI AGENT</span>
+      </a>
+      <div class="nav-actions">
+        <a href="index.html" class="nav-auth-btn">← Plan another trip</a>
+        <div id="nav-auth-slot">
+          <a href="login.html" class="nav-auth-btn">Sign in</a>
+        </div>
+      </div>
+    </nav>
+
     <div id="results-content" hidden>
 
       <header class="ticket-header">
         <div class="ticket-main">
           <div class="ticket-meta-badges">
             <span class="ticket-eyebrow" id="ticket-tier"></span>
+            <span class="ticket-traveler-pill" id="ticket-traveler-badge" style="display:none;">
+              <span class="ticket-traveler-avatar" id="ticket-traveler-avatar">👤</span>
+              <span class="ticket-traveler-text">Traveler: <strong id="ticket-traveler-name">Guest</strong></span>
+            </span>
             <span class="ticket-budget-pill">
               <span class="ticket-budget-label">Est. Total</span>
               <strong class="ticket-budget-val" id="ticket-budget">—</strong>
@@ -180,6 +199,7 @@
     </form>
   </aside>
 
+  <script src="session.js"></script>
   <script src="results.js"></script>
 </body>
 

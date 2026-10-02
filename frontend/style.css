@@ -80,6 +80,205 @@ legend {
   margin: 0 auto;
 }
 
+/* ==========================================================================
+   Site Navigation & User Header
+   ========================================================================== */
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  background: rgba(18, 32, 58, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-on-ink);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  border-bottom: 1px solid rgba(226, 218, 200, 0.16);
+  z-index: 10;
+  position: relative;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  color: #F8F5EC;
+  transition: opacity 0.18s ease;
+}
+
+.brand:hover {
+  opacity: 0.9;
+}
+
+.brand-mark {
+  width: 26px;
+  height: 26px;
+  stroke: var(--route-gold);
+  flex-shrink: 0;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nav-tagline {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-on-ink-muted);
+  font-weight: 500;
+}
+
+.nav-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(227, 154, 45, 0.16);
+  border: 1px solid rgba(227, 154, 45, 0.45);
+  color: #F5C678;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-auth-btn:hover {
+  background: var(--route-gold);
+  color: var(--ink);
+  border-color: var(--route-gold);
+  transform: translateY(-1px);
+}
+
+.nav-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 14px 4px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(227, 154, 45, 0.35);
+  color: #F8F5EC;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.nav-user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--route-gold) 0%, #B87F35 100%);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.nav-user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nav-user-name {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-signout-btn {
+  background: none;
+  border: none;
+  color: var(--text-on-ink-muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 3px 6px;
+  margin-left: 2px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  text-decoration: underline;
+}
+
+.nav-signout-btn:hover {
+  color: #FF8F8F;
+}
+
+/* User Greeting Banner */
+.user-greeting-banner {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(227, 154, 45, 0.14);
+  border: 1px solid rgba(227, 154, 45, 0.38);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 0.92rem;
+  color: var(--ink);
+  animation: fadeInGreeting 0.3s ease-out;
+}
+
+.greeting-icon {
+  font-size: 1.1rem;
+  color: var(--route-gold-deep);
+}
+
+.greeting-text strong {
+  color: var(--route-gold-deep);
+}
+
+@keyframes fadeInGreeting {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Traveler Ticket Pill on Results Page */
+.ticket-traveler-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(27, 36, 51, 0.06);
+  border: 1px solid rgba(27, 36, 51, 0.14);
+  font-size: 0.82rem;
+  color: var(--text-ink);
+}
+
+.ticket-traveler-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--route-gold);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.ticket-traveler-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .hero {
   position: relative;
   background: linear-gradient(180deg, var(--paper-white) 0%, #F3ECDC 100%);
@@ -1644,6 +1843,85 @@ body {
   color: var(--text-muted);
 }
 
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nav-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: 0 1px 3px rgba(15, 27, 45, 0.05);
+  transition: all 0.2s ease;
+}
+
+.nav-auth-btn:hover {
+  background: var(--paper-white);
+  border-color: var(--route-gold);
+  color: var(--accent);
+  box-shadow: 0 2px 6px rgba(214, 154, 78, 0.2);
+}
+
+.nav-user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 6px;
+  background: #fff;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--text-ink);
+  box-shadow: 0 1px 3px rgba(15, 27, 45, 0.04);
+}
+
+.nav-user-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  overflow: hidden;
+}
+
+.nav-user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nav-signout-btn {
+  border: none;
+  background: none;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+.nav-signout-btn:hover {
+  color: var(--coral);
+  text-decoration: underline;
+}
+
 .hero-title em {
   font-style: normal;
   color: var(--accent);
@@ -2268,4 +2546,167 @@ body {
 
 .dest-tile[data-dest="Rome"] {
   background-image: linear-gradient(to top, rgba(15,27,45,.78), rgba(15,27,45,.05) 65%), url("images/dest-rome.jpg"),     linear-gradient(135deg,#4a5a78,#1c2e4a);
+}
+
+/* ==========================================================================
+   Session Inactivity Timeout Modal & Notice Banner
+   ========================================================================== */
+.session-timeout-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 27, 45, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 20px;
+  animation: sessionFadeIn 0.25s ease-out;
+}
+
+@keyframes sessionFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.session-timeout-card {
+  position: relative;
+  width: min(440px, 94vw);
+  background: var(--paper-white, #F8F5EC);
+  border: 1.5px solid var(--route-gold, #D69A4E);
+  border-radius: 18px;
+  padding: 32px 28px 26px;
+  box-shadow: 0 28px 70px rgba(10, 18, 30, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  text-align: center;
+  animation: sessionSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes sessionSlideUp {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.session-timeout-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(214, 154, 78, 0.16);
+  border: 2px solid var(--route-gold, #D69A4E);
+  font-size: 26px;
+  margin-bottom: 16px;
+  animation: sessionPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes sessionPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.session-timeout-title {
+  font-family: var(--font-display, "Fraunces", Georgia, serif);
+  font-size: 23px;
+  font-weight: 600;
+  color: var(--ink, #0F1B2D);
+  margin: 0 0 8px;
+  line-height: 1.25;
+}
+
+.session-timeout-text {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 14.5px;
+  color: var(--text-muted, #5A606E);
+  line-height: 1.5;
+  margin: 0 0 18px;
+}
+
+.session-timeout-countdown-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: var(--ink, #0F1B2D);
+  color: var(--route-gold, #D69A4E);
+  font-family: var(--font-body, "Inter", monospace);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 12px rgba(15, 27, 45, 0.2);
+}
+
+.session-timeout-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.session-timeout-btn-stay {
+  width: 100%;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 10px;
+  background: var(--ink, #0F1B2D);
+  color: var(--text-on-ink, #F1ECDD);
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 4px 14px rgba(15, 27, 45, 0.25);
+}
+
+.session-timeout-btn-stay:hover {
+  background: var(--ink-soft, #1C2E4A);
+  transform: translateY(-1px);
+}
+
+.session-timeout-btn-logout {
+  width: 100%;
+  padding: 11px 16px;
+  border: 1px solid var(--border-soft, rgba(30, 36, 48, 0.18));
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted, #6B6F7A);
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.session-timeout-btn-logout:hover {
+  background: rgba(184, 81, 56, 0.08);
+  color: var(--coral, #B85138);
+  border-color: rgba(184, 81, 56, 0.3);
+}
+
+/* Notice box on login page */
+.session-notice-box {
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.45;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: sessionFadeIn 0.3s ease;
+}
+
+.session-notice-box.warning {
+  background: #FFF6E7;
+  border: 1px solid #F0C379;
+  color: #8C5300;
+}
+
+.session-notice-box.success {
+  background: #E8F5E9;
+  border: 1px solid #A5D6A7;
+  color: #1B5E20;
 }

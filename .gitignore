@@ -217,34 +217,44 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Not uploaded
+# Project Local Secrets & Environment
 .env
+.env.*
+!.env.example
+auth_users.json
+.auth_secret
+users.json
+
+# Checkpoints, Database & State
 checkpoints.json
+*.db
+*.sqlite
+*.sqlite3
+
+# Scratchpad, Debug & Test Scripts
 scratch/
 scratch/*
 scratch/**
-scratch/test_*.py
-scratch/test_backfill.py
-scratch/test_dedup.py
-scratch/test_dynamic_hub.py
-scratch/test_dynamic_hubs_2.py
-scratch/test_dynamic_hubs_3.py
-scratch/test_fallback.py
-scratch/test_generic_address.py
-scratch/test_hub_fn.py
-scratch/test_images.py
-scratch/test_lookup_flights.py
-scratch/test_pipeline_dedup.py
-scratch/test_tavily_images.py
-scratch/test_wikipedia.py
+/scratch/
+/scratch/**
 test.py
 test_*.py
 debug_*.py
 debug_itinerary.py
-*.zip
+tempCodeRunnerFile.py
+
+# Editor & IDE Settings
 .vscode/
-__pycache__/
-*.pyc
+.idea/
+*.swp
+*.swo
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archives & Temporary Artifacts
+*.zip
+*.tar.gz
 demo.excalidraw
-
-

@@ -2,19 +2,60 @@
   "use strict";
 
   // Backend origin. Points to the deployed Render backend API.
-  // When loaded directly from the Render deployment, relative paths are used;
-  // otherwise, requests route directly to the production Render URL.
   const RENDER_BACKEND_URL = "https://yatrimind-travel-planner-ai-agent.onrender.com";
+  let activeApiBase = null;
 
-  const API_BASE =
-    window.location.origin === RENDER_BACKEND_URL
-      ? ""
-      : (
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1"
-        )
-      ? "http://127.0.0.1:8000"
-      : RENDER_BACKEND_URL;
+  function getApiBase() {
+    if (activeApiBase !== null) return activeApiBase;
+
+    // 1. If currently on Render or matches RENDER_BACKEND_URL, use relative origin
+    if (window.location.origin === RENDER_BACKEND_URL || window.location.hostname.endsWith(".onrender.com")) {
+      activeApiBase = "";
+      return "";
+    }
+
+    // 2. If running directly on port 8000 (FastAPI), use relative origin
+    if (window.location.port === "8000") {
+      activeApiBase = "";
+      return "";
+    }
+
+    // 3. If running locally on another port (e.g. Live Server on 5500, Vite, file://)
+    if (window.location.hostname === "localhost") {
+      return "http://localhost:8000";
+    }
+    if (window.location.hostname === "127.0.0.1" || !window.location.protocol.startsWith("http")) {
+      return "http://127.0.0.1:8000";
+    }
+
+    // 4. Default for external deployed frontend (e.g. Vercel, Netlify)
+    return RENDER_BACKEND_URL;
+  }
+
+  function getAuthToken() {
+    if (window.YatraSession) return window.YatraSession.getToken();
+    return localStorage.getItem("yatramind_token") || sessionStorage.getItem("yatramind_token") || "";
+  }
+
+  function getCurrentUser() {
+    if (window.YatraSession) return window.YatraSession.getUser();
+    try {
+      const raw = localStorage.getItem("yatramind_user") || sessionStorage.getItem("yatramind_user");
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function getAuthHeaders(extraHeaders = {}) {
+    if (window.YatraSession) return window.YatraSession.getAuthHeaders(extraHeaders);
+    const headers = { "Content-Type": "application/json", ...extraHeaders };
+    const token = getAuthToken();
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    return headers;
+  }
 
   const destinationEl = document.getElementById("destination");
   const originEl = document.getElementById("origin");
@@ -243,12 +284,39 @@
     submitBtn.disabled = true;
     startLoading();
 
+    let apiBase = getApiBase();
+    let res;
     try {
-      const res = await fetch(`${API_BASE}/api/plan-trip`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      try {
+        res = await fetch(`${apiBase}/api/plan-trip`, {
+          method: "POST",
+          headers: getAuthHeaders(),
+          credentials: "include",
+          body: JSON.stringify(payload),
+        });
+      } catch (fetchErr) {
+        // If local 8000 was unreachable and not already using Render, auto-fallback to deployed Render backend!
+        if (apiBase && apiBase !== RENDER_BACKEND_URL && !window.location.hostname.endsWith(".onrender.com")) {
+          console.warn("[TRIPMATE] Local backend unreachable, trying deployed Render backend...");
+          apiBase = RENDER_BACKEND_URL;
+          activeApiBase = RENDER_BACKEND_URL;
+          res = await fetch(`${apiBase}/api/plan-trip`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            credentials: "include",
+            body: JSON.stringify(payload),
+          });
+        } else {
+          throw fetchErr;
+        }
+      }
+
+      if (res.status === 401) {
+        // Save form payload so the traveler's inputs are preserved!
+        sessionStorage.setItem("pendingTripPayload", JSON.stringify(payload));
+        window.location.href = "login.html?redirect=index.html&autoPlan=1";
+        return;
+      }
 
       let body = null;
       try { body = await res.json(); } catch (_) { /* no body */ }
@@ -262,11 +330,153 @@
 
       sessionStorage.setItem("tripItinerary", JSON.stringify(body));
       sessionStorage.setItem("tripRequestPayload", JSON.stringify(payload));
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        sessionStorage.setItem("tripUser", JSON.stringify(currentUser));
+      }
       window.location.href = "results.html";
     } catch (err) {
-      showError(`Couldn't reach the planner at ${API_BASE}. Make sure the backend is running there, then try again.`);
+      showError(`Couldn't reach the planner at ${apiBase || 'server'}. Make sure the backend is running, then try again.`);
       stopLoading();
       submitBtn.disabled = false;
     }
   });
+
+  // ---------- User Session & Profile Rendering ----------
+  function renderUserNav(user) {
+    const slot = document.getElementById("nav-auth-slot");
+    const greetingBanner = document.getElementById("user-greeting-banner");
+    const greetingName = document.getElementById("greeting-user-name");
+
+    if (!slot) return;
+    if (user && (user.name || user.email)) {
+      const displayName = user.name || user.email.split("@")[0];
+      const initial = (displayName[0] || "U").toUpperCase();
+      slot.innerHTML = `
+        <div class="nav-user-pill">
+          <span class="nav-user-avatar">${user.picture ? `<img src="${user.picture}" alt="${displayName}">` : initial}</span>
+          <span class="nav-user-name">${displayName}</span>
+          <button type="button" class="nav-signout-btn" id="nav-signout-btn" title="Sign out">Log out</button>
+        </div>
+      `;
+      if (greetingBanner && greetingName) {
+        greetingName.textContent = displayName;
+        greetingBanner.style.display = "flex";
+      }
+      document.getElementById("nav-signout-btn")?.addEventListener("click", () => {
+        if (window.YatraSession) {
+          window.YatraSession.logout({ reason: "manual" });
+        } else {
+          fetch(`${getApiBase()}/api/auth/logout`, { method: "POST", headers: getAuthHeaders(), credentials: "include" }).catch(() => {});
+          localStorage.removeItem("yatramind_user");
+          localStorage.removeItem("yatramind_token");
+          sessionStorage.removeItem("yatramind_user");
+          sessionStorage.removeItem("yatramind_token");
+          sessionStorage.removeItem("tripUser");
+          renderUserNav(null);
+          if (greetingBanner) greetingBanner.style.display = "none";
+          window.location.href = "login.html?logout=1";
+        }
+      });
+    } else {
+      slot.innerHTML = `<a href="login.html" class="nav-auth-btn" id="nav-login-btn">Sign in</a>`;
+      if (greetingBanner) greetingBanner.style.display = "none";
+    }
+  }
+
+  function initUserSession() {
+    // 0. Verify if existing session has expired from inactivity
+    if (window.YatraSession && window.YatraSession.isSessionExpired()) {
+      window.YatraSession.logout({ reason: "timeout" });
+      return;
+    }
+
+    // 1. Immediately render local user from storage (zero UI delay)
+    const localUser = getCurrentUser();
+    if (localUser) {
+      renderUserNav(localUser);
+      if (window.YatraSession) window.YatraSession.recordActivity(true);
+    } else {
+      renderUserNav(null);
+    }
+
+    // 2. Validate in background with the backend
+    fetch(`${getApiBase()}/api/auth/me`, { headers: getAuthHeaders(), credentials: "include" })
+      .then(res => {
+        if (!res.ok) throw new Error("Unauthenticated");
+        return res.json();
+      })
+      .then(data => {
+        if (data.user) {
+          if (window.YatraSession) {
+            window.YatraSession.setSession(data.user, getAuthToken());
+          } else {
+            const userJson = JSON.stringify(data.user);
+            localStorage.setItem("yatramind_user", userJson);
+            sessionStorage.setItem("yatramind_user", userJson);
+          }
+          renderUserNav(data.user);
+        }
+      })
+      .catch(() => {
+        // If unauthenticated by backend, clear stale credentials
+        if (window.YatraSession) {
+          window.YatraSession.clearSession();
+        } else {
+          localStorage.removeItem("yatramind_user");
+          localStorage.removeItem("yatramind_token");
+        }
+        renderUserNav(null);
+      });
+  }
+
+  // ---------- Restore Pending Trip & Auto-Plan Support ----------
+  function checkPendingTrip() {
+    const raw = sessionStorage.getItem("pendingTripPayload");
+    if (!raw) return;
+
+    try {
+      const p = JSON.parse(raw);
+      if (p.destination) destinationEl.value = p.destination;
+      if (p.origin) originEl.value = p.origin;
+      if (p.start_date) startDateEl.value = p.start_date;
+      if (p.end_date) endDateEl.value = p.end_date;
+      if (p.travelers) travelersEl.value = p.travelers;
+      if (p.currency) {
+        currencyEl.value = p.currency;
+        budgetSymbolEl.textContent = CURRENCY_SYMBOLS[p.currency] || p.currency;
+      }
+      if (p.budget) {
+        budgetDisplayEl.value = formatForCurrency(String(p.budget), p.currency || "INR");
+      }
+      if (p.trip_tier) {
+        const radio = formEl.querySelector(`input[name="trip_tier"][value="${p.trip_tier}"]`);
+        if (radio) radio.checked = true;
+      }
+      if (Array.isArray(p.interests)) {
+        document.querySelectorAll('#interests-group input[type="checkbox"]').forEach(cb => {
+          cb.checked = p.interests.includes(cb.value);
+        });
+      }
+      updateDurationNote();
+      refreshBudgetWords();
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("autoPlan") === "1") {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        sessionStorage.removeItem("pendingTripPayload");
+
+        if (getCurrentUser() || getAuthToken()) {
+          setTimeout(() => {
+            submitBtn.click();
+          }, 450);
+        }
+      }
+    } catch (e) {
+      console.warn("[TRIPMATE] Failed restoring pending trip:", e);
+    }
+  }
+
+  initUserSession();
+  checkPendingTrip();
 })();
